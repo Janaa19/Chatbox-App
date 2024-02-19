@@ -1,0 +1,16 @@
+// ContentView.swift
+import SwiftUI
+
+struct ContentView: View {
+    @StateObject var viewModel: ChatboxViewModel
+    
+    init() {
+        self._viewModel = StateObject(wrappedValue: ChatboxViewModel(username: "your_username", password: "your_password", recipientUsername: "recipient_username"))
+    }
+    
+    var body: some View {
+        NavigationView {
+            ChatView(viewModel: viewModel)
+        }
+    }
+}
