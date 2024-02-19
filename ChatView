@@ -1,4 +1,7 @@
-// ChatView.swift
+// make sure to use OSU Scarlet and grey. 
+
+
+
 import SwiftUI
 
 struct ChatView: View {
@@ -8,7 +11,7 @@ struct ChatView: View {
         VStack {
             HStack {
                 Spacer()
-                Image("ohio_state_logo")
+                Image("osu_logo") // Replace with OSU logo
                     .resizable()
                     .frame(width: 100, height: 100)
                 Spacer()
