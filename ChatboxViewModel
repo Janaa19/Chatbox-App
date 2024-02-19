@@ -17,5 +17,81 @@ class ChatboxViewModel: ObservableObject {
         fetchMessageHistory()
     }
     
-    // Remaining code from the ChatboxViewModel you provided
+    func fetchMessageHistory() {
+        guard let url = URL(string: "\(LinkToDatabase.link)/messages/history?user=\(username)&recipient=\(recipientUsername)") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        authenticateRequest(&request)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                let decodedData = try decoder.decode([Message].self, from: data)
+                
+                DispatchQueue.main.async {
+                    self.messages = decodedData
+                }
+            } catch {
+                print("Error decoding JSON: \(error)")
+            }
+        }.resume()
+    }
+    
+    func sendMessage() {
+        guard let url = URL(string: "\(LinkToDatabase.link)/messages/send") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        authenticateRequest(&request)
+        
+        let message = Message(sender: username, recipient: recipientUsername, content: newMessageText)
+        do {
+            let encoder = JSONEncoder()
+            let jsonData = try encoder.encode(message)
+            request.httpBody = jsonData
+        } catch {
+            print("Error encoding message")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.newMessageText = "" // Clear the text field
+                self.fetchMessageHistory() // Reload the messages to include the new one
+            }
+        }.resume()
+    }
+    
+    private func authenticateRequest(_ request: inout URLRequest) {
+        let loginString = "\(username):\(password)"
+        guard let loginData = loginString.data(using: .utf8) else {
+            print("Error encoding login credentials")
+            return
+        }
+        let base64LoginString = loginData.base64EncodedString()
+        request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+    }
 }
