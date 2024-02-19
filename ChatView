@@ -1,0 +1,68 @@
+// ChatView.swift
+import SwiftUI
+
+struct ChatView: View {
+    @ObservedObject var viewModel: ChatboxViewModel
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Image("ohio_state_logo")
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                Spacer()
+            }
+            .padding()
+            
+            List(viewModel.messages) { message in
+                MessageRow(message: message)
+            }
+            
+            HStack {
+                TextField("Type a message...", text: $viewModel.newMessageText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+                Button(action: sendMessage) {
+                    Text("Send")
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.red) // OSU's scarlet color
+                        .cornerRadius(8)
+                }
+                .padding()
+            }
+        }
+        .navigationTitle("Ohio State Chat")
+    }
+    
+    private func sendMessage() {
+        viewModel.sendMessage()
+    }
+}
+
+struct MessageRow: View {
+    var message: Message
+    
+    var body: some View {
+        HStack {
+            if message.sender == viewModel.username {
+                Spacer()
+                Text(message.content)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.red) // OSU's scarlet color
+                    .cornerRadius(8)
+            } else {
+                Text(message.content)
+                    .padding()
+                    .foregroundColor(.black)
+                    .background(Color.gray.opacity(0.2)) // Light gray background
+                    .cornerRadius(8)
+                Spacer()
+            }
+        }
+        .padding(.horizontal)
+    }
+}
