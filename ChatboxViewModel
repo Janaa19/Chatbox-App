@@ -1,0 +1,21 @@
+// ChatboxViewModel.swift
+import SwiftUI
+import Combine
+
+class ChatboxViewModel: ObservableObject {
+    @Published var messages: [Message] = []
+    @Published var newMessageText: String = ""
+    
+    private var username: String
+    private var password: String
+    private var recipientUsername: String
+    
+    init(username: String, password: String, recipientUsername: String) {
+        self.username = username
+        self.password = password
+        self.recipientUsername = recipientUsername
+        fetchMessageHistory()
+    }
+    
+    // Remaining code from the ChatboxViewModel you provided
+}
